@@ -23,7 +23,7 @@ namespace Rewards.Controllers
         [HttpGet()]
         public async Task<UserRewardResponse> GetUserRewards(int id, [FromQuery] UserRewardRequest request)
         {
-            return await _commandExecutor.ExecuteCommandAsync<GetUserRewards, UserRewardResponse>(c => c.SetParameters(request));
+            return await _commandExecutor.ExecuteCommandAsync<GetUserRewards, UserRewardResponse>(c => c.SetParameters(id, request));
         }
     }
 }

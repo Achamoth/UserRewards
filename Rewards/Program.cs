@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Configuration.GetConnectionString("Database");
 ConfigureServices(builder.Services, builder.Configuration);
 
 var app = builder.Build();
@@ -32,8 +33,9 @@ static void ConfigureServices(IServiceCollection services, ConfigurationManager 
     if (configuration.GetValue<string>("PersistentStorage") == "FileStorage")
     {
         services.AddSingleton<IStorageProvider, FileStorageProvider>();
+        if (!Directory.Exists("users"))
+            Directory.CreateDirectory("users");
     }
-    // Otherwise I would use a DB
 }
 
 static void RegisterCommands(IServiceCollection services)

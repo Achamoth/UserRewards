@@ -2,6 +2,6 @@
 {
     public class UserRewardRequest
     {
-        public DateTime At { get; set; }
+        public DateTime? At { get; set; }
     }
 }

@@ -7,7 +7,7 @@
         public class Reward
         {
             public DateTime AvailableAt { get; set; }
-            public DateTime RedeemedAt { get; set; }
+            public DateTime? RedeemedAt { get; set; }
             public DateTime ExpiresAt { get; set; }
         }
     }
