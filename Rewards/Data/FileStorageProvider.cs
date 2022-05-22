@@ -58,7 +58,7 @@ namespace Rewards.Data
                 {
                     AvailableAt = DateTime.Parse(tokens[0].Trim()),
                     ExpiresAt = DateTime.Parse(tokens[2].Trim()),
-                    RedeemedAt = string.IsNullOrEmpty(tokens[1].Trim()) ? null : (DateTime?)DateTime.Parse(tokens[1].Trim()),
+                    RedeemedAt = string.IsNullOrEmpty(tokens[1].Trim()) ? null : DateTime.Parse(tokens[1].Trim()),
                     UserId = id
                 });
             }
