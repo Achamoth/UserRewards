@@ -7,7 +7,7 @@ namespace Rewards.Controllers
 {
     [ApiController]
     [Route("users")]
-    public class UsersController : Controller
+    public class UsersController : ControllerBase
     {
         private readonly ICommandExecutor _commandExecutor;
 
@@ -19,11 +19,18 @@ namespace Rewards.Controllers
         /// <summary>
         /// GET User rewards for a specified week
         /// </summary>
-        [Route("/{id}/rewards")]
-        [HttpGet()]
+        [Route("{id}/rewards")]
+        [HttpGet]
         public async Task<UserRewardResponse> GetUserRewards(int id, [FromQuery] UserRewardRequest request)
         {
             return await _commandExecutor.ExecuteCommandAsync<GetUserRewards, UserRewardResponse>(c => c.SetParameters(id, request));
+        }
+
+        [Route("{id}/rewards/{availableAt}/redeem")]
+        [HttpPatch]
+        public async Task<RedeemRewardResponse> RedeemUserReward(int id, DateTime availableAt)
+        {
+            return await _commandExecutor.ExecuteCommandAsync<RedeemReward, RedeemRewardResponse>(c => c.SetParameters(id, availableAt));
         }
     }
 }

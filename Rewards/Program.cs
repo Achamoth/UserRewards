@@ -3,10 +3,6 @@ using Rewards.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Configuration.GetConnectionString("Database");
 ConfigureServices(builder.Services, builder.Configuration);
 
 var app = builder.Build();
@@ -27,6 +23,13 @@ app.Run();
 
 static void ConfigureServices(IServiceCollection services, ConfigurationManager configuration)
 {
+    services.AddControllers();
+    services.AddEndpointsApiExplorer();
+    services.AddSwaggerGen(options =>
+    {
+        options.CustomSchemaIds(type => type.ToString());
+    });
+
     RegisterCommands(services);
     services.AddScoped<ICommandExecutor, CommandExecutor>();
 

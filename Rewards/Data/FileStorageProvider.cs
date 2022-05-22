@@ -11,13 +11,35 @@ namespace Rewards.Data
             File.WriteAllText($"users/{user.Id}.txt", "");
         }
 
-        public async Task AddRewardAsync(Reward reward)
+        public async Task AddOrUpdateRewardAsync(Reward reward)
         {
-            // Rudimentary; doesn't check if reward already exists
+            // Not efficient
             await Task.CompletedTask;
-            File.AppendAllText(
-                $"users/{reward.UserId}.txt",
-                $"{reward.AvailableAt},{reward.RedeemedAt.ToString() ?? ""},{reward.ExpiresAt}\n");
+            var newRewardLine = $"{reward.AvailableAt},{reward.RedeemedAt.ToString() ?? ""},{reward.ExpiresAt}";
+            var filepath = $"users/{reward.UserId}.txt";
+            var modifiedLine = false;
+
+            if (File.Exists(filepath))
+            {
+                var lines = File.ReadAllLines(filepath).ToList();
+                for (var i = 0; i < lines.Count; i++)
+                {
+                    var line = lines[i].Trim();
+                    if (line.StartsWith(reward.AvailableAt.ToString()))
+                    {
+                        lines[i] = newRewardLine;
+                        modifiedLine = true;
+                        break;
+                    }
+                }
+                if (!modifiedLine)
+                    lines.Add(newRewardLine);
+                File.WriteAllLines(filepath, lines);
+            }
+            else
+            {
+                File.WriteAllText(filepath, newRewardLine);
+            }
         }
 
         public async Task<User> FindUserByIdAsync(int id)
@@ -36,7 +58,8 @@ namespace Rewards.Data
                 {
                     AvailableAt = DateTime.Parse(tokens[0].Trim()),
                     ExpiresAt = DateTime.Parse(tokens[2].Trim()),
-                    RedeemedAt = string.IsNullOrEmpty(tokens[1].Trim()) ? null : (DateTime?)DateTime.Parse(tokens[1].Trim())
+                    RedeemedAt = string.IsNullOrEmpty(tokens[1].Trim()) ? null : (DateTime?)DateTime.Parse(tokens[1].Trim()),
+                    UserId = id
                 });
             }
             return user;

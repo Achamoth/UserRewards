@@ -57,7 +57,7 @@ namespace Rewards.Command
                         ExpiresAt = startOfWeek.AddDays(i + 1),
                         UserId = _userId
                     };
-                    await _storageProvider.AddRewardAsync(reward);
+                    await _storageProvider.AddOrUpdateRewardAsync(reward);
                     result.Data.Add(MapToResponse(reward));
                 }
             }
