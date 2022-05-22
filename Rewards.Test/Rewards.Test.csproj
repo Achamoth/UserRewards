@@ -22,11 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Command\" />
-    <Folder Include="Data\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Rewards\Rewards.csproj" />
   </ItemGroup>
 

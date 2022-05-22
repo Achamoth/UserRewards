@@ -4,19 +4,22 @@ using Rewards.Data;
 using Rewards.Domain;
 using Rewards.Helpers;
 using Rewards.Middleware;
+using Rewards.Services;
 
 namespace Rewards.Command
 {
     public class GetUserRewards : ICommand<UserRewardResponse>
     {
         private readonly IStorageProvider _storageProvider;
+        private readonly IDateTimeService _dateTimeService;
 
         private int _userId;
         private UserRewardRequest _request;
 
-        public GetUserRewards(IStorageProvider storageProvider)
+        public GetUserRewards(IStorageProvider storageProvider, IDateTimeService dateTimeService)
         {
             _storageProvider = storageProvider;
+            _dateTimeService = dateTimeService;
         }
 
         public void SetParameters(int id, UserRewardRequest request)
@@ -30,7 +33,7 @@ namespace Rewards.Command
             var result = new UserRewardResponse { Data = new List<UserRewardResponse.Reward>() };
 
             // Assume we want to use current week if none provided
-            var startOfWeek = _request.At?.GetStartOfWeek() ?? DateTime.Now.GetStartOfWeek();
+            var startOfWeek = _request.At?.GetStartOfWeek() ?? _dateTimeService.Now.GetStartOfWeek();
             var endOfWeek = startOfWeek.AddDays(6);
 
             var user = await _storageProvider.FindUserByIdAsync(_userId);
@@ -64,7 +67,7 @@ namespace Rewards.Command
             }
             else
             {
-                foreach (var reward in rewardsForWeek)
+                foreach (var reward in rewardsForWeek.OrderBy(r => r.AvailableAt))
                 {
                     result.Data.Add(MapToResponse(reward));
                 }

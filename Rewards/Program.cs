@@ -1,6 +1,7 @@
 using Rewards.Command;
 using Rewards.Data;
 using Rewards.Middleware;
+using Rewards.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +34,7 @@ static void ConfigureServices(IServiceCollection services, ConfigurationManager 
 
     RegisterCommands(services);
     services.AddScoped<ICommandExecutor, CommandExecutor>();
+    services.AddScoped<IDateTimeService, DateTimeService>();
 
     if (configuration.GetValue<string>("PersistentStorage") == "FileStorage")
     {
