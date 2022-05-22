@@ -2,19 +2,22 @@
 using Rewards.Data;
 using Rewards.Domain;
 using Rewards.Middleware;
+using Rewards.Services;
 
 namespace Rewards.Command
 {
     public class RedeemReward : ICommand<RedeemRewardResponse>
     {
         private readonly IStorageProvider _storageProvider;
+        private readonly IDateTimeService _dateTimeService;
 
         private int _userId;
         private DateTime _availableAt;
 
-        public RedeemReward(IStorageProvider storageProvider)
+        public RedeemReward(IStorageProvider storageProvider, IDateTimeService dateTimeService)
         {
             _storageProvider = storageProvider;
+            _dateTimeService = dateTimeService;
         }
 
         public void SetParameters(int userId, DateTime availableAt)
@@ -36,12 +39,15 @@ namespace Rewards.Command
             if (reward == null)
                 throw new HttpResponseException(StatusCodes.Status404NotFound, $"This reward could not be found for user {_userId}");
 
-            if (reward.ExpiresAt < DateTime.Now) // Not checking AvailableAt as documentation doesn't mention it
+            if (reward.ExpiresAt < _dateTimeService.Now)
                 throw new HttpResponseException(StatusCodes.Status400BadRequest, "This reward is already expired");
+
+            if (reward.AvailableAt > _dateTimeService.Now) // Assumption
+                throw new HttpResponseException(StatusCodes.Status400BadRequest, "This reward is not ready to claim");
 
             if (reward.RedeemedAt == null)
             {
-                reward.RedeemedAt = DateTime.Now;
+                reward.RedeemedAt = _dateTimeService.Now;
                 await _storageProvider.AddOrUpdateRewardAsync(reward);
             }
 
