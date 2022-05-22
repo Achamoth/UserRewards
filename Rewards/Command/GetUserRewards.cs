@@ -3,6 +3,7 @@ using Rewards.Contracts.Response;
 using Rewards.Data;
 using Rewards.Domain;
 using Rewards.Helpers;
+using Rewards.Middleware;
 
 namespace Rewards.Command
 {
@@ -45,7 +46,7 @@ namespace Rewards.Command
             var rewardsForWeek = user.Rewards.Where(r => r.AvailableAt >= startOfWeek && r.AvailableAt <= endOfWeek);
 
             if (rewardsForWeek.Any() && rewardsForWeek.Count() != 7)
-                throw new Exception("Invalid rewards for user"); // Rudimentary; this should never happen
+                throw new HttpResponseException(StatusCodes.Status400BadRequest, "The user's rewards are invalid"); // Rudimentary error-handling; this should never happen
 
             if (!rewardsForWeek.Any())
             {

@@ -1,6 +1,7 @@
 ﻿using Rewards.Contracts.Response;
 using Rewards.Data;
 using Rewards.Domain;
+using Rewards.Middleware;
 
 namespace Rewards.Command
 {
@@ -27,16 +28,16 @@ namespace Rewards.Command
             var user = await _storageProvider.FindUserByIdAsync(_userId);
 
             if (user == null)
-                throw new Exception($"User not found for id {_userId}");
+                throw new HttpResponseException(StatusCodes.Status404NotFound ,$"User {_userId} not found");
 
             var availableAtMidnight = _availableAt.Date;
             var reward = user.Rewards.SingleOrDefault(r => r.AvailableAt == availableAtMidnight);
 
             if (reward == null)
-                throw new Exception("No reward found");
+                throw new HttpResponseException(StatusCodes.Status404NotFound, $"This reward could not be found for user {_userId}");
 
             if (reward.ExpiresAt < DateTime.Now) // Not checking AvailableAt as documentation doesn't mention it
-                throw new Exception("This reward is already expired");
+                throw new HttpResponseException(StatusCodes.Status400BadRequest, "This reward is already expired");
 
             if (reward.RedeemedAt == null)
             {

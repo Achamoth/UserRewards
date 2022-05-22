@@ -1,5 +1,6 @@
 using Rewards.Command;
 using Rewards.Data;
+using Rewards.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,7 +24,7 @@ app.Run();
 
 static void ConfigureServices(IServiceCollection services, ConfigurationManager configuration)
 {
-    services.AddControllers();
+    services.AddControllers(options => options.Filters.Add<HttpResponseExceptionFilter>());
     services.AddEndpointsApiExplorer();
     services.AddSwaggerGen(options =>
     {
